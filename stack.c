@@ -1,6 +1,8 @@
 #include "stack.h"
 #include "alloc.h"
 #include <error.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 stack
 create_stack ()
@@ -60,7 +62,7 @@ pop (stack s)
 }
 
 void*
-peer (stack)
+peer (stack s)
 {
 	if (!is_empty(s))
 		return s->next->element;
