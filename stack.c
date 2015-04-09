@@ -9,7 +9,7 @@ create_stack ()
 {
     stack s;
 
-    s = (stack)malloc(sizeof(struct node));
+    s = (stack)checked_malloc(sizeof(struct node));
     if (s == NULL)
       error (1, 0, "Fail to allocate memory");
     s->next = 0;
@@ -41,7 +41,7 @@ push (void* element, stack s)
 {
 	node_t tmp_node;
 
-	tmp_node = (node_t)malloc(sizeof(struct node));
+	tmp_node = (node_t)checked_malloc(sizeof(struct node));
 	tmp_node->element = element;
 	tmp_node->next = s->next;
 	s->next = tmp_node;
