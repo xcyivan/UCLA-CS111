@@ -72,14 +72,25 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
     }
     //this if is to extract the subshell expressed as ()
     if(ch=='('){
+      int badLine = countLine;
+      printf("enter subshell: badLine=%d\n",badLine);
       do{
         str = str_append(str,ch);
         if(ch=='(') countParath++;
         if(ch==')') countParath--;
         if(ch=='\n') countLine++;
         //printf("2:countLine=%d\n",countLine);
-        ch=get_next_byte(fp);
-      }while(countParath);
+        ch=getc(fp);
+      }while(countParath && ch!=EOF);
+      if(ch==EOF){
+        word[countWord]=malloc(sizeof(str)+1);
+        memset(word[countWord],'\0',sizeof(str)+1);
+        word[countWord]=str;
+        atLine[countWord]=badLine;
+        countWord++;
+        str="";
+        break;
+      }
     }
 
     if(ch!='\n'){

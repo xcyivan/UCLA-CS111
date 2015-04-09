@@ -46,6 +46,7 @@ for bad in \
   '( (a)' \
   'a>>>b'
 do
+  # echo $n
   echo "$bad" >test$n.sh || exit
   ../timetrash -p test$n.sh >test$n.out 2>test$n.err && {
     echo >&2 "test$n: unexpectedly succeeded for: $bad"
