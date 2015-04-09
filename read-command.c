@@ -32,7 +32,7 @@ typedef struct token *token_t;
 
 char* str_append(char* orig, char c){
   size_t sz = strlen(orig);
-  char* str = malloc(sz+2);
+  char* str = checked_malloc(sz+2);
   strcpy(str,orig);
   str[sz]=c;
   str[sz+1]='\0';
@@ -90,7 +90,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
         ch=getc(fp);
       }while(countParath && ch!=EOF);
       if(ch==EOF){
-        word[countWord]=malloc(sizeof(str)+1);
+        word[countWord]=checked_malloc(sizeof(str)+1);
         memset(word[countWord],'\0',sizeof(str)+1);
         word[countWord]=str;
         atLine[countWord]=badLine;
@@ -113,7 +113,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
       countLine++;
       //printf("3:countLine=%d\n",countLine);
       if(preCh=='\n' && strlen(str)>0){
-        word[countWord]=malloc(sizeof(str)+1);
+        word[countWord]=checked_malloc(sizeof(str)+1);
         memset(word[countWord],'\0',sizeof(str)+1);
         word[countWord]=str;
         countWord++;
@@ -139,7 +139,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
   }
   //if the last word doesn't end with "\n\n", also add it in
   if(str!=""){
-    word[countWord]=malloc(sizeof(str)+1);
+    word[countWord]=checked_malloc(sizeof(str)+1);
     memset(word[countWord],'\0',sizeof(str)+1);
     word[countWord]=str;
     countWord++;
@@ -198,7 +198,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
   while(ptrOld<countWord && ptrNew<newCountWord){
     if(merge[ptrOld]<0) {
       //printf("hi: %d\n",ptrOld);
-      commandStr[ptrNew] = malloc(abs(merge[ptrOld])+1);
+      commandStr[ptrNew] = checked_malloc(abs(merge[ptrOld])+1);
       strcpy(commandStr[ptrNew],word[ptrOld]);
       newAtLine[ptrNew]=atLine[ptrOld];
     }
@@ -212,7 +212,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
       if(ptrOld==countWord){
         //printf("\n\nhuge bug!!!\n\n");
         //printf("\ncpyLen=%d\n\n",(int)cpyLen);
-        commandStr[ptrNew] = malloc(cpyLen+1);
+        commandStr[ptrNew] = checked_malloc(cpyLen+1);
         memset(commandStr[ptrNew],'\0',cpyLen+1);
         newAtLine[ptrNew]=atLine[startPtr];
         while(startPtr<=--ptrOld){
@@ -223,7 +223,7 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
       }
       cpyLen+=abs(merge[ptrOld]);
       //printf("\ncpyLen=%d\n\n",(int)cpyLen);
-      commandStr[ptrNew] = malloc(cpyLen+1);
+      commandStr[ptrNew] = checked_malloc(cpyLen+1);
       memset(commandStr[ptrNew],'\0',cpyLen+1);
       newAtLine[ptrNew]=atLine[startPtr];
       while(startPtr<=ptrOld){
@@ -236,16 +236,16 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
   }
   for(i=0;i<newCountWord;i++){
     //printf("1111: CMD%d at line %d is:\n%s",i,newAtLine[i],commandStr[i]);
-    m_separation[i]=malloc(sizeof(Separation));
-    m_separation[i]->m_cmd = malloc(strlen(commandStr[i])+1);
+    m_separation[i]=checked_malloc(sizeof(Separation));
+    m_separation[i]->m_cmd = checked_malloc(strlen(commandStr[i])+1);
     strcpy(m_separation[i]->m_cmd,commandStr[i]);
     m_separation[i]->m_line=newAtLine[i];
     //printf("CMD%d at line %d is:\n%s",i,m_separation[i]->m_line,m_separation[i]->m_cmd);
   } 
 
   //write an end indicating element
-  m_separation[newCountWord]=malloc(sizeof(Separation));
-  m_separation[newCountWord]->m_cmd=malloc(strlen("this is the end")+1);
+  m_separation[newCountWord]=checked_malloc(sizeof(Separation));
+  m_separation[newCountWord]->m_cmd=checked_malloc(strlen("this is the end")+1);
   strcpy(m_separation[newCountWord]->m_cmd, "this is the end");
   m_separation[newCountWord]->m_line=-1;
   //=================================end of merge word======================================================
@@ -256,10 +256,10 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
 void 
 make_token (token_t *token_array, int token_index, char *buffer, int line_num, int *in_simple_comman_t)
 {
-  char *tmp = malloc(sizeof (char) * 64);
+  char *tmp = checked_malloc(sizeof (char) * 64);
   memset(tmp, 0, 64);
   strcpy(tmp, buffer);
-  token_array[token_index] = malloc(sizeof (token_t));
+  token_array[token_index] = checked_malloc(sizeof (token_t));
   token_array[token_index]->word = tmp;
   token_array[token_index]->line_num = line_num;
   *in_simple_comman_t = 0;
@@ -484,7 +484,7 @@ tokenize (const char *command_tree, token_t *token_array, int line_num)
     make_token(token_array, token_index, buffer, line_offset + line_num, &in_simple_comman);
     token_index++;
   }
-  token_array[token_index] = malloc(sizeof (token_t));
+  token_array[token_index] = checked_malloc(sizeof (token_t));
   token_array[token_index]->line_num = -1;
 
 }
@@ -581,7 +581,7 @@ validate (token_t *token_array)
       {
         if (token_array[i + 1]->word[0] != ')') 
         {
-          token_t *sub_token_array = malloc(sizeof (token_t) * 128);
+          token_t *sub_token_array = checked_malloc(sizeof (token_t) * 128);
           tokenize (token_array[i+1]->word, sub_token_array, token_array[i+1]->line_num);
 
           // int j = 0;
@@ -714,7 +714,7 @@ validate_all (Separation_t *commands_str)
 {
   int i = 0;
   int res = 1;
-  token_t *token_array = malloc(sizeof (token_t) * 128);
+  token_t *token_array = checked_malloc(sizeof (token_t) * 128);
   while (commands_str[i]->m_line != -1)
   {
     tokenize (commands_str[i]->m_cmd, token_array, commands_str[i]->m_line);
@@ -765,7 +765,7 @@ eat_tail_white_space(char* word)
   int i;
   char *res;
   for (i = len - 1; word[i] == ' ' || word[i] == '\t'; i--);
-  res = malloc(sizeof(char) * (i+2));
+  res = checked_malloc(sizeof(char) * (i+2));
   memset(res, 0, i+2);
   int j;
   for (j = 0; j <= i; j++)
@@ -831,10 +831,10 @@ make_simple_command(char* token, command_t cmd){
       }
     }
   }
-  cmd->u.word = malloc(count * 128);
+  cmd->u.word = checked_malloc(count * 128);
   memset(cmd->u.word, 0, count * 128);
   for(i=0;i<count;i++){
-    cmd->u.word[i]=malloc(strlen(str[i])+1);
+    cmd->u.word[i]=checked_malloc(strlen(str[i])+1);
     strcpy(cmd->u.word[i],str[i]);
   } 
 
@@ -887,7 +887,7 @@ make_command(token_t *token_array, command_t* out_cmd)
         {
           pop(operator_stack);
         }
-        command_t sub_cmd = malloc(sizeof(struct command));
+        command_t sub_cmd = checked_malloc(sizeof(struct command));
         command_t subshell = (command_t)pop(command_stack);
         make_subshell_command(subshell, sub_cmd);
         push(sub_cmd, command_stack);
@@ -902,7 +902,7 @@ make_command(token_t *token_array, command_t* out_cmd)
           oper = (char*)pop(operator_stack);
           command_t cmd2 = (command_t)pop(command_stack);
           command_t cmd1 = (command_t)pop(command_stack);
-          command_t new_cmd = malloc(sizeof(struct command));
+          command_t new_cmd = checked_malloc(sizeof(struct command));
           make_compound_command(cmd1, cmd2, oper, new_cmd);
           push(new_cmd, command_stack);
           if (!is_empty(operator_stack))
@@ -917,10 +917,10 @@ make_command(token_t *token_array, command_t* out_cmd)
     }
     else 
     {
-      // command_t cmd = malloc(sizeof(struct command));
+      // command_t cmd = checked_malloc(sizeof(struct command));
       if (i > 0 && !strcmp(token_array[i - 1]->word, "("))
       {
-        token_t *sub_token_array = malloc(sizeof(struct token) * 128);
+        token_t *sub_token_array = checked_malloc(sizeof(struct token) * 128);
         tokenize(token, sub_token_array, token_array[i]->line_num);
         command_t cmd[1];
         make_command(sub_token_array, cmd);
@@ -928,7 +928,7 @@ make_command(token_t *token_array, command_t* out_cmd)
       }
       else
       {
-        command_t cmd = malloc(sizeof(struct command));
+        command_t cmd = checked_malloc(sizeof(struct command));
         make_simple_command(token, cmd);
         push(cmd, command_stack);
       }
@@ -948,7 +948,7 @@ make_command(token_t *token_array, command_t* out_cmd)
       char *oper = (char*)pop(operator_stack);
       command_t cmd2 = (command_t)pop(command_stack);
       command_t cmd1 = (command_t)pop(command_stack);
-      out_cmd[0] = malloc(sizeof(struct command));
+      out_cmd[0] = checked_malloc(sizeof(struct command));
       make_compound_command(cmd1, cmd2, oper, out_cmd[0]);
       push(out_cmd[0], command_stack);
     }
@@ -971,9 +971,9 @@ make_commands (FILE* filename, int (*get_next_byte) (void *), command_t* res)
     int i = 0;
     while (m_sp[i]->m_line != -1)
     {
-      // command_t cmd = malloc(sizeof(struct command));
+      // command_t cmd = checked_malloc(sizeof(struct command));
       command_t cmd[1];
-      token_t *token_array = malloc(sizeof(struct token)*128);
+      token_t *token_array = checked_malloc(sizeof(struct token)*128);
       tokenize(m_sp[i]->m_cmd, token_array, m_sp[i]->m_line);
       make_command(token_array, cmd);
       res[i] = cmd[0];
@@ -1010,19 +1010,19 @@ make_command_stream (int (*get_next_byte) (void *),
      You can also use external functions defined in the GNU C Library.  */
   // get_next_byte(get_next_byte_argument);
 
-  command_t *res = malloc(sizeof(command_t) * 128);
+  command_t *res = checked_malloc(sizeof(command_t) * 128);
   memset(res, 0, 128);
   
   make_commands(get_next_byte_argument, get_next_byte, res);
 
-  commandNode_t node = malloc(sizeof(struct commandNode));
+  commandNode_t node = checked_malloc(sizeof(struct commandNode));
   node->next = NULL;
   commandNode_t cursor = node;
 
   int i = 0;
   while (res[i] != NULL)
   {
-    commandNode_t tmp_node = malloc(sizeof(struct commandNode));
+    commandNode_t tmp_node = checked_malloc(sizeof(struct commandNode));
     cursor->next = tmp_node;
     cursor = cursor->next;
     cursor->command = res[i];
@@ -1031,7 +1031,7 @@ make_command_stream (int (*get_next_byte) (void *),
   }
   cursor->next = NULL;
 
-  command_stream_t stream = malloc(sizeof(struct command_stream));
+  command_stream_t stream = checked_malloc(sizeof(struct command_stream));
   stream->head = node->next;
   stream->cursor = node->next;
   stream->tail = cursor;
