@@ -63,11 +63,11 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
 
     //this if is to get rid of comment starting with '#', while the tailing '\n' is preserved 
     if(ch=='#'){
-      while(get_next_byte(fp)!='\n'){
-        continue;
+      while(ch!='\n' && ch!=EOF){
+        ch=getc(fp);
       }
       countLine++;
-      ch=get_next_byte(fp);
+      ch=getc(fp);
       continue;
     }
     //this if is to extract the subshell expressed as ()
@@ -75,11 +75,18 @@ makeSeparation(FILE* fp, Separation_t* m_separation, int (*get_next_byte) (void 
       int badLine = countLine;
       printf("enter subshell: badLine=%d\n",badLine);
       do{
+        if(ch=='#'){
+          while(ch!='\n' && ch!=EOF){
+            ch=getc(fp);
+          }
+          countLine++;
+          ch=getc(fp);
+          continue;
+        }
         str = str_append(str,ch);
         if(ch=='(') countParath++;
         if(ch==')') countParath--;
         if(ch=='\n') countLine++;
-        //printf("2:countLine=%d\n",countLine);
         ch=getc(fp);
       }while(countParath && ch!=EOF);
       if(ch==EOF){
