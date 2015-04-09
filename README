@@ -8,5 +8,5 @@ Shiyuan (York) Yang: 804397286
 Cheyuan (Ivan) Xia: 504422348
 
 Lab1a limitations:
-1. Cannot parse subshell with multiple command.
-2. Cannot parse subshell with one command followed by or following more than 2 '\n'.
+1. Cannot parse subshell with multiple commands.
+2. Cannot parse subshell with one command followed by or following more than 2 '\n's.
